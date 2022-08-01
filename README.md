@@ -1,6 +1,6 @@
 # StubHub
 
-Reading a list of events from a file
+Basic application to read a list of events from a file
 
 Things this project has:
 * Dagger hilt dependency injection
