@@ -1,0 +1,62 @@
+[
+  {
+    "id": 123981,
+    "city": "Houston",
+    "artiste": "Marilyn Manson",
+    "price": 18.75
+  },
+  {
+    "id": 123982,
+    "city": "Miami",
+    "artiste": "Alicia Keys",
+    "price": 28.75
+  },
+  {
+    "id": 123983,
+    "city": "Paris",
+    "artiste": "Paul McCartney",
+    "price": 29.15
+  },
+  {
+    "id": 123984,
+    "city": "Vancouver",
+    "artiste": "Ringo Star",
+    "price": 7.29
+  },
+  {
+    "id": 123985,
+    "city": "Toronto",
+    "artiste": "George Harrison",
+    "price": 9.10
+  },
+  {
+    "id": 123986,
+    "city": "Amsterdam",
+    "artiste": "Myley Cirus",
+    "price": 15.44
+  },
+  {
+    "id": 123987,
+    "city": "Roma",
+    "artiste": "Bad Bunny",
+    "price": 16.75
+  },
+  {
+    "id": 123988,
+    "city": "Egypt",
+    "artiste": "Axl Roses",
+    "price": 20.00
+  },
+  {
+    "id": 123989,
+    "city": "Texas",
+    "artiste": "Freddy Mercury",
+    "price": 27.90
+  },
+  {
+    "id": 123990,
+    "city": "Mexico",
+    "artiste": "John Lennon",
+    "price": 30.00
+  }
+]
