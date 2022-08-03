@@ -17,12 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.stubhub.models.Child
 import com.example.stubhub.models.Event
 import com.example.stubhub.ui.theme.StubHubTheme
 
 @Composable
 fun EventsScreen(
-    listOfEvents: List<Event>,
+    rootChild: Child?,
     valueName: String,
     onValueChangeName: (String) -> Unit,
     valuePrice: String,
@@ -31,14 +32,49 @@ fun EventsScreen(
 ) {
     Column {
         TopPanel(valueName, onValueChangeName, valuePrice, onValueChangePrice, onSearchButton)
-        ContentList(listOfEvents)
+
+        rootChild?.let {
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = rootChild.name,
+                style = MaterialTheme.typography.titleLarge
+            )
+            CategoryList(rootChild)
+        } ?: Text(
+            text = "No results found",
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(8.dp)
+        )
     }
 }
 
 @Composable
-private fun ContentList(listOfEvents: List<Event>) {
-    LazyColumn {
-        items(listOfEvents) { event ->
+private fun CategoryList(rootChild: Child) {
+    LazyColumn() {
+        items(rootChild.children) { child ->
+            Column {
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = child.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                child.children.forEach { subChild ->
+                    EventList(subChild)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EventList(child: Child) {
+    Column {
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = child.name,
+            style = MaterialTheme.typography.titleSmall
+        )
+        child.events.forEach { event ->
             OutlinedCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -56,12 +92,22 @@ private fun ContentList(listOfEvents: List<Event>) {
                         )
                         Text(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            text = event.artiste,
-                            style = MaterialTheme.typography.titleLarge
+                            text = event.city,
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            text = event.city,
+                            text = event.date,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            text = event.venueName,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            text = event.distanceFromVenue.toString(),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -135,21 +181,33 @@ private fun TopPanel(
 @Composable
 fun EventScreenPreview() {
     StubHubTheme {
-        ContentList(
-            listOf(
-                Event(
-                    id = 1929313L,
-                    artiste = "Freddy Mercury",
-                    city = "Vancouver",
-                    price = 13.9
-                ),
-                Event(
-                    id = 1929314L,
-                    artiste = "John Lennon",
-                    city = "Houston",
-                    price = 23.9
-                ),
+        EventList(
+            Child(
+                id = 123,
+                name = "Hip Hop",
+                children = emptyList(),
+                events = listOf(
+                    Event(
+                        id = 1929313L,
+                        name = "Freddy Mercury",
+                        city = "Vancouver",
+                        price = 13.9,
+                        venueName = "3rd avenue",
+                        date = "3 July 2022",
+                        distanceFromVenue = 312.1321
+                    ),
+                    Event(
+                        id = 1929314L,
+                        name = "John Lennon",
+                        city = "Houston",
+                        price = 23.9,
+                        venueName = "3rd avenue",
+                        date = "3 July 2022",
+                        distanceFromVenue = 312.1321
+                    ),
+                )
             )
+
         )
     }
 }
