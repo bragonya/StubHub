@@ -5,11 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.stubhub.ui.theme.StubHubTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,7 +25,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             StubHubTheme {
-                val events by viewModel.events.collectAsState()
+                val state by viewModel.events.collectAsState()
                 val name by viewModel.name
                 val price by viewModel.price
                 // A surface container using the 'background' color from the theme
@@ -30,14 +33,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    EventsScreen(
-                        listOfEvents = events,
-                        valueName = name,
-                        onValueChangeName = { viewModel.name.value = it },
-                        valuePrice = price,
-                        onValueChangePrice = { viewModel.price.value = it },
-                        onSearchButton = { viewModel.getEvents() }
-                    )
+                    when(val rState = state) {
+                        is MainState.Success -> EventsScreen(
+                                                    rootChild = rState.rootChild,
+                                                    valueName = name,
+                                                    onValueChangeName = { viewModel.name.value = it },
+                                                    valuePrice = price,
+                                                    onValueChangePrice = { viewModel.price.value = it },
+                                                    onSearchButton = { viewModel.getRootChild() }
+                                                )
+                        is MainState.Loading -> Text(text = "Loading")
+                    }
                 }
             }
         }
@@ -45,7 +51,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getEvents()
+        viewModel.getRootChild()
     }
 }
 
