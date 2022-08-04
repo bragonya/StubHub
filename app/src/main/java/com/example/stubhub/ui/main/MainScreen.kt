@@ -16,14 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.stubhub.models.Child
 import com.example.stubhub.models.Event
 import com.example.stubhub.ui.theme.StubHubTheme
 import kotlin.math.max
-import kotlin.math.min
 
 @Composable
 fun EventsScreen(
@@ -36,13 +34,7 @@ fun EventsScreen(
 ) {
     Column {
         TopPanel(valueName, onValueChangeName, valuePrice, onValueChangePrice, onSearchButton)
-
         rootChild?.let {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = rootChild.name,
-                style = MaterialTheme.typography.headlineLarge
-            )
             CategoryList(rootChild)
         } ?: Text(
             text = "No results found",
@@ -54,25 +46,27 @@ fun EventsScreen(
 
 @Composable
 private fun CategoryList(rootChild: Child) {
-    LazyColumn() {
-        items(rootChild.children) { child ->
-            Column {
-                val stack = mutableListOf<Pair<Child, Int>>()
-                stack.add(child to 0)
-                while (stack.isNotEmpty()) {
-                    val (currentChild, level) = stack.removeAt(0)
-                    val textSize = (max(25 - level * 5, 5)).sp
-                    if(currentChild.children.isNotEmpty()) {
-                        Text(
-                            modifier = Modifier.padding(8.dp),
-                            text = currentChild.name,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontSize = textSize
-                        )
-                        stack.addAll(0, currentChild.children.map { it to level + 1 })
-                    } else {
-                        EventList(currentChild, textSize)
-                    }
+    LazyColumn {
+        val stack = mutableListOf<Pair<Child, Int>>()
+        stack.add(rootChild to 0)
+        while (stack.isNotEmpty()) {
+            val (currentChild, level) = stack.removeAt(0)
+            val textSize = (max(30 - level * 5, 5)).sp
+
+            item {
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = currentChild.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = textSize
+                )
+            }
+
+            if(currentChild.children.isNotEmpty()) {
+                stack.addAll(0, currentChild.children.map { it to level + 1 })
+            } else {
+                items(currentChild.events) { event ->
+                    EventList(event = event)
                 }
             }
         }
@@ -80,61 +74,51 @@ private fun CategoryList(rootChild: Child) {
 }
 
 @Composable
-private fun EventList(child: Child, textSize: TextUnit) {
-    Column {
-        Text(
-            modifier = Modifier.padding(8.dp),
-            text = child.name,
-            style = MaterialTheme.typography.titleSmall,
-            fontSize = textSize
-        )
-        child.events.forEach { event ->
-            OutlinedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+private fun EventList(event: Event) {
+    OutlinedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+    ) {
+        Row() {
+            Column(
+                modifier = Modifier.fillMaxWidth(0.8f)
             ) {
-                Row() {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(0.8f)
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(8.dp),
-                            text = "#${event.id}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray,
-                        )
-                        Text(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            text = event.city,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            text = event.date,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            text = event.venueName,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            text = event.distanceFromVenue.toString(),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-                    Text(
-                        modifier = Modifier.padding(8.dp),
-                        text = "$${event.price}",
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = "#${event.id}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    text = event.city,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    text = event.date,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    text = event.venueName,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    text = event.distanceFromVenue.toString(),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
+
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = "$${event.price}",
+                style = MaterialTheme.typography.labelLarge
+            )
         }
+
     }
 }
 
@@ -196,32 +180,15 @@ private fun TopPanel(
 fun EventScreenPreview() {
     StubHubTheme {
         EventList(
-            Child(
-                id = 123,
-                name = "Hip Hop",
-                children = emptyList(),
-                events = listOf(
-                    Event(
-                        id = 1929313L,
-                        name = "Freddy Mercury",
-                        city = "Vancouver",
-                        price = 13.9,
-                        venueName = "3rd avenue",
-                        date = "3 July 2022",
-                        distanceFromVenue = 312.1321
-                    ),
-                    Event(
-                        id = 1929314L,
-                        name = "John Lennon",
-                        city = "Houston",
-                        price = 23.9,
-                        venueName = "3rd avenue",
-                        date = "3 July 2022",
-                        distanceFromVenue = 312.1321
-                    ),
-                )
+            Event(
+                id = 1929314L,
+                name = "John Lennon",
+                city = "Houston",
+                price = 23.9,
+                venueName = "3rd avenue",
+                date = "3 July 2022",
+                distanceFromVenue = 312.1321
             ),
-            25.sp
         )
     }
 }
