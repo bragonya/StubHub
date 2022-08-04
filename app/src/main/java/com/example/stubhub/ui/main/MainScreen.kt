@@ -16,10 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.stubhub.models.Child
 import com.example.stubhub.models.Event
 import com.example.stubhub.ui.theme.StubHubTheme
+import kotlin.math.max
+import kotlin.math.min
 
 @Composable
 fun EventsScreen(
@@ -37,7 +41,7 @@ fun EventsScreen(
             Text(
                 modifier = Modifier.padding(8.dp),
                 text = rootChild.name,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.headlineLarge
             )
             CategoryList(rootChild)
         } ?: Text(
@@ -53,13 +57,22 @@ private fun CategoryList(rootChild: Child) {
     LazyColumn() {
         items(rootChild.children) { child ->
             Column {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = child.name,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                child.children.forEach { subChild ->
-                    EventList(subChild)
+                val stack = mutableListOf<Pair<Child, Int>>()
+                stack.add(child to 0)
+                while (stack.isNotEmpty()) {
+                    val (currentChild, level) = stack.removeAt(0)
+                    val textSize = (max(25 - level * 5, 5)).sp
+                    if(currentChild.children.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(8.dp),
+                            text = currentChild.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = textSize
+                        )
+                        stack.addAll(0, currentChild.children.map { it to level + 1 })
+                    } else {
+                        EventList(currentChild, textSize)
+                    }
                 }
             }
         }
@@ -67,12 +80,13 @@ private fun CategoryList(rootChild: Child) {
 }
 
 @Composable
-private fun EventList(child: Child) {
+private fun EventList(child: Child, textSize: TextUnit) {
     Column {
         Text(
             modifier = Modifier.padding(8.dp),
             text = child.name,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleSmall,
+            fontSize = textSize
         )
         child.events.forEach { event ->
             OutlinedCard(
@@ -206,8 +220,8 @@ fun EventScreenPreview() {
                         distanceFromVenue = 312.1321
                     ),
                 )
-            )
-
+            ),
+            25.sp
         )
     }
 }
