@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
                 val state by viewModel.events.collectAsState()
                 val name by viewModel.name
                 val price by viewModel.price
+                val cheapestChecked by viewModel.cheapest
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -40,7 +41,9 @@ class MainActivity : ComponentActivity() {
                                                     onValueChangeName = { viewModel.name.value = it },
                                                     valuePrice = price,
                                                     onValueChangePrice = { viewModel.price.value = it },
-                                                    onSearchButton = { viewModel.getRootChild() }
+                                                    onSearchButton = { viewModel.getRootChild() },
+                                                    cheapestChecked = cheapestChecked,
+                                                    onCheapestChanged = { viewModel.cheapest.value = it }
                                                 )
                         is MainState.Loading -> Text(text = "Loading")
                     }

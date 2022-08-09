@@ -1,9 +1,6 @@
 package com.example.stubhub.ui.main
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,9 +28,19 @@ fun EventsScreen(
     valuePrice: String,
     onValueChangePrice: (String) -> Unit,
     onSearchButton: () -> Unit,
+    cheapestChecked: Boolean,
+    onCheapestChanged: (Boolean) -> Unit,
 ) {
     Column {
-        TopPanel(valueName, onValueChangeName, valuePrice, onValueChangePrice, onSearchButton)
+        TopPanel(
+            valueName,
+            onValueChangeName,
+            valuePrice,
+            onValueChangePrice,
+            onSearchButton,
+            cheapestChecked,
+            onCheapestChanged
+        )
         rootChild?.let {
             CategoryList(rootChild)
         } ?: Text(
@@ -129,7 +136,9 @@ private fun TopPanel(
     onValueChangeName: (String) -> Unit,
     valuePrice: String,
     onValueChangePrice: (String) -> Unit,
-    onSearchButton: () -> Unit
+    onSearchButton: () -> Unit,
+    cheapestChecked: Boolean,
+    onCheapestChanged: (Boolean) -> Unit,
 ) {
     ElevatedCard {
         Column(
@@ -170,6 +179,13 @@ private fun TopPanel(
                     modifier = Modifier.padding(start = 8.dp),
                 )
             }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = cheapestChecked,
+                    onCheckedChange = onCheapestChanged
+                )
+                Text(text = "Filter by cheapest")
+            }
         }
     }
 
@@ -202,6 +218,8 @@ fun TopPanelPreview() {
             {},
             "",
             {},
+            {},
+            false,
             {}
         )
     }

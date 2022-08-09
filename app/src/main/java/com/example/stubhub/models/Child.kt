@@ -7,10 +7,10 @@ data class Child (
     val id: Int,
     val name: String,
     val events: List<Event>,
-    val children: List<Child>
+    val children: List<Child>,
 ) {
 
-    fun filter(name: String, price: String): Child? {
+    fun filter(name: String, price: String, cheapest: Boolean): Child? {
         fun dfs(currentChild: Child): Child? {
             return if (currentChild.events.isNotEmpty()) {
                 val filterEvents = currentChild.events.filter { name.isBlank() || it.city.contains(name, ignoreCase = true) }
@@ -26,6 +26,28 @@ data class Child (
                 if(newChildren.isNotEmpty()) currentChild.copy(children = newChildren) else null
             }
         }
-        return dfs(this)
+
+        fun cheapest(currentChild: Child?): Pair<Double, Child?> {
+            if(currentChild == null) return 0.0 to null
+            return if(currentChild.events.isNotEmpty()) {
+                val cheapestEvent = currentChild.events.minBy { it.price }
+                cheapestEvent.price to currentChild.copy(events = listOf(cheapestEvent))
+            } else {
+                var min = Double.MAX_VALUE
+                var minNode: Child? = null
+                currentChild.children.forEach { subChild ->
+                    cheapest(subChild).let { (price, node) ->
+                        if(price <= min){
+                            minNode = node
+                            min = price
+                        }
+                    }
+                }
+                min to currentChild.copy(children = listOf(minNode!!))
+            }
+        }
+
+        val filteredList = dfs(this)
+        return  if(cheapest) cheapest(filteredList).second else filteredList
     }
 }

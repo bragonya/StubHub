@@ -16,9 +16,10 @@ class MainViewModel @Inject constructor(
     val events = MutableStateFlow<MainState>(MainState.Loading)
     val name = mutableStateOf("")
     val price = mutableStateOf("")
+    val cheapest = mutableStateOf(false)
 
     fun getRootChild() {
-        events.value = MainState.Success(repository.getChildren(name.value, price.value))
+        events.value = MainState.Success(repository.getChildren(name.value, price.value, cheapest.value))
     }
 }
 

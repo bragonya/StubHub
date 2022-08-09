@@ -10,7 +10,7 @@ import javax.inject.Inject
 class EventsRepository @Inject constructor(val fileManager: FileManager){
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun getChildren(name: String, price: String) = json
+    fun getChildren(name: String, price: String, cheapest: Boolean) = json
         .decodeFromString<Child>(fileManager.readFromAsset("input.json"))
-        .filter(name, price)
+        .filter(name, price, cheapest)
 }
